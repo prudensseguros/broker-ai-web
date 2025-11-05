@@ -9,6 +9,8 @@ RUN apk add --no-cache \
     unzip \
     git \
     sqlite \
+    nodejs \
+    npm \
     libzip-dev \
     linux-headers \
     && docker-php-ext-install pdo pdo_mysql zip
