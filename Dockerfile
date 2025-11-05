@@ -26,7 +26,7 @@ COPY . .
 # Instalar dependencias de Laravel (agregago sqlite)
 RUN composer install --no-dev --optimize-autoloader --no-scripts \
     && touch database/database.sqlite \
-    npm install && npm run build
+    && npm install && npm run build
 
 
 # Permisos
