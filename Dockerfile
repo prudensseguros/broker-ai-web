@@ -23,8 +23,9 @@ RUN addgroup -g 1000 www && adduser -u 1000 -G www -s /bin/sh -D www
 WORKDIR /var/www
 COPY . .
 
-# Instalar dependencias de Laravel
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Instalar dependencias de Laravel (agregago sqlite)
+RUN composer install --no-dev --optimize-autoloader --no-scripts \
+    && touch database/database.sqlite
 
 # Permisos
 RUN chown -R www:www /var/www/storage /var/www/bootstrap/cache
