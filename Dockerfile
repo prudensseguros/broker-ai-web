@@ -26,10 +26,21 @@ WORKDIR /var/www
 COPY . .
 
 # Instalar dependencias de Laravel (agregago sqlite)
-RUN composer install --no-dev --optimize-autoloader --no-scripts \
-    && touch database/database.sqlite \
-    && npm install --legacy-peer-deps && npm run build
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
+# Crear archivo de base de datos SQLite
+RUN touch database/database.sqlite 
+
+# Instalar dependencias de Node y compilar assets CON LOGS
+RUN echo "===== Installing NPM dependencies =====" \
+    && npm install --legacy-peer-deps \
+    && echo "===== NPM install completed =====" \
+    && echo "===== Running npm run build =====" \
+    && npm run build \
+    && echo "===== Build completed =====" \
+    && ls -la /var/www/public/ \
+    && echo "===== Checking build directory =====" \
+    && ls -la /var/www/public/build/ || echo "WARNING: build directory does not exist!"
 
 # Permisos
 RUN chown -R www:www /var/www/storage /var/www/bootstrap/cache
@@ -39,6 +50,12 @@ RUN mkdir -p /var/www/storage/framework/{cache,sessions,views,data} \
     /var/www/bootstrap/cache \
     && chown -R www:www /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# IMPORTANTE: Asegurar permisos en public/build
+RUN if [ -d /var/www/public/build ]; then \
+        chown -R www:www /var/www/public/build && \
+        chmod -R 755 /var/www/public/build; \
+    fi
 
 # Configuración de nginx
 COPY .docker/nginx.conf /etc/nginx/http.d/default.conf
